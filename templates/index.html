@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Viability Assessment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Ensure the canvas is constrained */
+        #viabilityChart {
+            width: 400px !important;   /* Set fixed width */
+            height: 300px !important;  /* Set fixed height */
+        }
+    </style>
+</head>
+<body>
+    <h1>Startup Viability Assessment</h1>
+    <form method="POST">
+        <label for="business_idea">Business Idea:</label><br>
+        <input type="text" id="business_idea" name="business_idea"><br><br>
+        <label for="sector">Sector:</label><br>
+        <input type="text" id="sector" name="sector"><br><br>
+        <label for="target_market">Target Market:</label><br>
+        <input type="text" id="target_market" name="target_market"><br><br>
+        <label for="competition">Competition:</label><br>
+        <input type="text" id="competition" name="competition"><br><br>
+        <label for="uniqueness">Product Uniqueness:</label><br>
+        <input type="text" id="uniqueness" name="uniqueness"><br><br>
+        <label for="revenue_model">Revenue Model:</label><br>
+        <input type="text" id="revenue_model" name="revenue_model"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    {% if result %}
+    <h2>Viability Analysis:</h2>
+    <p>{{ result }}</p>
+
+    <h3>Viability Score: {{ viability_score }}</h3>
+    <h3>Viability Percentage: {{ viability_percentage }}%</h3>
+
+    {% if viability_percentage is not none %}
+    <canvas id="viabilityChart"></canvas>
+    <script>
+        var ctx = document.getElementById('viabilityChart').getContext('2d');
+        var viabilityChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Viability Percentage', 'Remaining Percentage'],
+                datasets: [{
+                    label: 'Viability',
+                    data: [{{ viability_percentage }}, 100 - {{ viability_percentage }}],
+                    backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,  // Ensures the chart will respect the canvas size
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    {% endif %}
+    {% endif %}
+</body>
+</html>

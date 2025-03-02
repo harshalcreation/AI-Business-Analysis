@@ -1,0 +1,193 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Viability Assessment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Ensure the canvas is constrained */
+        #viabilityChart {
+            width: 55% !important;   /* Set fixed width */
+            height:55% !important;  /* Set fixed height */
+        }
+
+        /* Add some styling to the form elements for better visual clarity */
+        form {
+            margin-bottom: 30px;
+            font-family: Arial, sans-serif;
+            text-align: center;  /* Center the form */
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            margin: 8px 0;
+            width: 100%;
+            max-width: 400px;  /* Max width for input fields */
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 40px;
+            animation: headerAnimation 2s ease-in-out infinite;
+            color: #4CAF50;
+        }
+
+        /* Animation for the header */
+        @keyframes headerAnimation {
+            0% {
+                transform: scale(1);
+                color: #4CAF50;
+            }
+            50% {
+                transform: scale(1.1);
+                color: #FF5733;
+            }
+            100% {
+                transform: scale(1);
+                color: #4CAF50;
+            }
+        }
+
+        h2, h3 {
+            margin-top: 20px;
+        }
+
+        /* Styling for the text next to the pie chart */
+        .viability-rates {
+            display: flex;
+            justify-content: space-between;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+
+        .rate {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .failure {
+            color: red;
+        }
+
+        /* Add fade-in effect for output */
+        .fade-in {
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Startup Viability Assessment</h1>
+    <form method="POST">
+        <label for="business_idea">Business Idea:</label><br>
+        <input type="text" id="business_idea" name="business_idea"><br><br>
+
+        <label for="sector">Sector:</label><br>
+        <input type="text" id="sector" name="sector"><br><br>
+
+        <label for="target_market">Target Market:</label><br>
+        <input type="text" id="target_market" name="target_market"><br><br>
+
+        <label for="competition">Competition:</label><br>
+        <input type="text" id="competition" name="competition"><br><br>
+
+        <label for="uniqueness">Product Uniqueness:</label><br>
+        <input type="text" id="uniqueness" name="uniqueness"><br><br>
+
+        <label for="revenue_model">Revenue Model:</label><br>
+        <input type="text" id="revenue_model" name="revenue_model"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    {% if result %}
+    <div class="fade-in">
+        <h2>Viability Analysis:</h2>
+        <p>{{ result }}</p>
+
+        <h3>Viability Score: {{ viability_score }}</h3>
+        <h3>Viability Percentage: {{ viability_percentage }}%</h3>
+
+        {% if viability_percentage is not none %}
+        <div class="viability-rates">
+            <!-- Displaying the Success and Failure Rates -->
+            <div class="rate success">Success Rate: {{ viability_percentage }}%</div>
+            <div class="rate failure">Failure Rate: {{ 100 - viability_percentage }}%</div>
+        </div>
+
+        <canvas id="viabilityChart"></canvas>
+        <script>
+            var ctx = document.getElementById('viabilityChart').getContext('2d');
+            var viabilityChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Success 👍', 'Failure 👎'],  // Custom labels with arrow emojis
+                    datasets: [{
+                        label: 'Viability',
+                        data: [{{ viability_percentage }}, 100 - {{ viability_percentage }}],
+                        backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
+                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,  // Ensures the chart will respect the canvas size
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 50 // Adjust font size of the legend labels
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw.toFixed(2) + '%';
+                                }
+                            },
+                            bodyFont: {
+                                size: 14 // Adjust font size of the tooltip labels
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+</html>
